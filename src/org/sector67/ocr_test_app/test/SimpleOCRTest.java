@@ -1,4 +1,4 @@
-package org.sector67.otp.ocr.test;
+package org.sector67.ocr_test_app.test;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
