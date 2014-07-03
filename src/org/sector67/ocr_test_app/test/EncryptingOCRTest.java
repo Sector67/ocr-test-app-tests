@@ -5,6 +5,8 @@ import java.util.Random;
 
 import org.sector67.otp.EncryptionException;
 import org.sector67.otp.cipher.OneTimePadCipher;
+import org.sector67.otp.encoding.ErrorCorrectingBase16Encoder;
+import org.sector67.otp.encoding.SimpleBase16Encoder;
 import org.sector67.otp.key.InMemoryKeyStore;
 import org.sector67.otp.key.KeyException;
 import org.sector67.otp.utils.BaseUtils;
@@ -61,7 +63,9 @@ public class EncryptingOCRTest extends AndroidTestCase {
 		String original = "Smallish message";
 		OneTimePadCipher cipher = new OneTimePadCipher(store);
 		byte[] encrypted = cipher.encrypt("encrypt-key", original);
-		String chunked = BaseUtils.getChunkedBase16(encrypted);
+		SimpleBase16Encoder encoder = new SimpleBase16Encoder();
+
+		String chunked = encoder.encode(encrypted);
 		
 		Log.i(TAG, "chunked output: " + chunked);
 
@@ -88,7 +92,7 @@ public class EncryptingOCRTest extends AndroidTestCase {
 		}
 		
 		//decrypt the text
-		byte[] decoded = BaseUtils.base16ToBytes(recognizedText);
+		byte[] decoded = encoder.decode(recognizedText);
 		String decrypted = cipher.decrypt("decrypt-key", decoded);
 		
 		assertEquals("The OCR'd text did not match the image", original, decrypted);
@@ -103,7 +107,9 @@ public class EncryptingOCRTest extends AndroidTestCase {
 		String original = "A somewhat larger message";
 		OneTimePadCipher cipher = new OneTimePadCipher(store);
 		byte[] encrypted = cipher.encrypt("encrypt-key", original);
-		String chunked = BaseUtils.getChunkedBase16(encrypted);
+		SimpleBase16Encoder encoder = new SimpleBase16Encoder();
+
+		String chunked = encoder.encode(encrypted);
 		
 		Log.i(TAG, "chunked output: " + chunked);
 
@@ -131,7 +137,7 @@ public class EncryptingOCRTest extends AndroidTestCase {
 		}
 		
 		//decrypt the text
-		byte[] decoded = BaseUtils.base16ToBytes(recognizedText);
+		byte[] decoded = encoder.decode(recognizedText);
 		String decrypted = cipher.decrypt("decrypt-key", decoded);
 		
 		assertEquals("The OCR'd text did not match the image", original, decrypted);
@@ -149,8 +155,9 @@ public class EncryptingOCRTest extends AndroidTestCase {
 		for(int i = 0 ; i < 10; i++) {
 			byte[] starting = new byte[20];
 			r.nextBytes(starting);
-			byte[] ecc = ErrorCorrectingUtils.encode(starting);
-			String chunked = BaseUtils.getChunkedBase16(ecc);
+			ErrorCorrectingBase16Encoder encoder = new ErrorCorrectingBase16Encoder();
+
+			String chunked = encoder.encode(starting);
 			Log.i(TAG, "chunked output: " + chunked);
 
 			//make an image out of it
@@ -197,9 +204,8 @@ public class EncryptingOCRTest extends AndroidTestCase {
 
 			try {
 			//decrypt the text
-			byte[] ending = BaseUtils.base16ToBytes(cleanedText);
 			
-			byte[] errorCorrected = ErrorCorrectingUtils.decode(ending);
+			byte[] errorCorrected = encoder.decode(cleanedText);
 			
 			assertTrue("The OCR'd text did not match the original [" + chunked + " ] [" + recognizedText + "]", Arrays.equals(starting, errorCorrected));
 			} catch (Exception e) {
@@ -220,10 +226,11 @@ public class EncryptingOCRTest extends AndroidTestCase {
 			byte[] starting = new byte[20];
 			r.nextBytes(starting);
 			
-			byte[] ecc = ErrorCorrectingUtils.encode(starting);
+			ErrorCorrectingBase16Encoder encoder = new ErrorCorrectingBase16Encoder();
+
+			String chunked = encoder.encode(starting);
 			//byte[] ecc = starting;
 			
-			String chunked = BaseUtils.getChunkedBase16(ecc);
 			Log.i(TAG, "chunked output: " + chunked);
 
 			//make an image out of it
@@ -254,9 +261,8 @@ public class EncryptingOCRTest extends AndroidTestCase {
 
 			try {
 			//decrypt the text
-			byte[] ending = BaseUtils.base16ToBytes(cleanedText);
 			
-			byte[] errorCorrected = ErrorCorrectingUtils.decode(ending);
+			byte[] errorCorrected = encoder.decode(cleanedText);
 			//byte[] errorCorrected = ending;
 			
 			assertTrue("The OCR'd text did not match the original [" + chunked + " ] [" + recognizedText + "]", Arrays.equals(starting, errorCorrected));
