@@ -93,7 +93,7 @@ public class EncryptingOCRTest extends AndroidTestCase {
 		
 		//decrypt the text
 		byte[] decoded = encoder.decode(recognizedText);
-		String decrypted = cipher.decrypt("decrypt-key", decoded);
+		String decrypted = cipher.decrypt("decrypt-key", 0, decoded);
 		
 		assertEquals("The OCR'd text did not match the image", original, decrypted);
 
@@ -138,7 +138,7 @@ public class EncryptingOCRTest extends AndroidTestCase {
 		
 		//decrypt the text
 		byte[] decoded = encoder.decode(recognizedText);
-		String decrypted = cipher.decrypt("decrypt-key", decoded);
+		String decrypted = cipher.decrypt("decrypt-key", 0, decoded);
 		
 		assertEquals("The OCR'd text did not match the image", original, decrypted);
 
